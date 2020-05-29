@@ -1,25 +1,60 @@
-<form action="/new" method="post">
-    <label for="name">Name</label>
-    <input type="text" name="name" id="name"><br>
-    <label for="duration">How long(days) to continue</label>
-    <input type="text" name="duration" id="duration"><br>
-    <label for="startdate">Starting Date</label>
-    <input type="text" name="day" id="day" placeholder="day">
-    <input type="text" name="month" id="month" placeholder="month">
-    <input type="text" name="year" id="year" placeholder="year"><br>
-    <label for="oneday">How many times to rpeate everyday</label>
-    <input type="text" name="oneday" id="oneday"><br>
-    <label for="oneday">How many times to rpeate in two day interval</label>
-    <input type="text" name="twoday" id="twoday"><br>
-    <label for="oneday">How many times to rpeate in three day interval</label>
-    <input type="text" name="threeday" id="threeday"><br>
-    <label for="oneday">How many times to rpeate in five day interval</label>
-    <input type="text" name="fiveday" id="fiveday"><br>
-    <label for="oneday">How many times to rpeate in seven day interval</label>
-    <input type="text" name="sevenday" id="sevenday"><br>
-    <label for="oneday">How many times to rpeate in ten day interval</label>
-    <input type="text" name="tenday" id="tenday"><br>
-    <label for="oneday">How many times to rpeate in fifteen day interval</label>
-    <input type="text" name="fifteenday" id="fifteenday"><br>
-    <input type="submit" value="Add Task"><br>
-</form>
+{% extends "base.html" %}
+{% block newtaskactive %} active {% endblock %}
+{% block body %}
+<div class="container my-4">
+    <form action="/new" method="post">
+        <div class="form-group">
+            <label for="name">Name of the task/topic</label>
+            <input type="text" class="form-control" name="name" id="name"><br>
+        </div>
+        <div class="form-inline">
+
+            <label for="duration">How long(days) to continue</label>
+            <input type="text" class="form-control mx-2" name="duration" id="duration"><br>
+        </div>
+        <div class="form-inline my-2">
+
+            <label for="startdate">Starting Date</label>
+            <input type="text" class="form-control m-2" name="day" id="day" placeholder="day">
+            <input type="text" class="form-control m-2" name="month" id="month" placeholder="month">
+            <input type="text" class="form-control m-2" name="year" id="year" placeholder="year"><br>
+        </div>
+        <div class="form-inline my-2">
+
+            <label for="oneday">How many times to repeat everyday</label>
+            <input type="text" class="form-control mx-2" name="oneday" id="oneday"><br>
+        </div>
+        <div class="form-inline my-2">
+
+            <label for="oneday">How many times to repeat in two day interval</label>
+            <input type="text" class="form-control mx-2" name="twoday" id="twoday"><br>
+        </div>
+        <div class="form-inline my-2">
+
+            <label for="oneday">How many times to repeat in three day interval</label>
+            <input type="text" class="form-control mx-2" name="threeday" id="threeday"><br>
+        </div>
+        <div class="form-inline my-2">
+
+            <label for="oneday">How many times to repeat in five day interval</label>
+            <input type="text" class="form-control mx-2" name="fiveday" id="fiveday"><br>
+        </div>
+        <div class="form-inline my-2">
+
+            <label for="oneday">How many times to repeat in seven day interval</label>
+            <input type="text" class="form-control mx-2" name="sevenday" id="sevenday"><br>
+        </div>
+        <div class="form-inline my-2">
+
+            <label for="oneday">How many times to repeat in ten day interval</label>
+            <input type="text" class="form-control mx-2" name="tenday" id="tenday"><br>
+        </div>
+        <div class="form-inline my-2">
+
+            <label for="oneday">How many times to repeat in fifteen day interval</label>
+            <input type="text" class="form-control mx-2" name="fifteenday" id="fifteenday"><br>
+        </div>
+        <input type="submit" class="btn btn-primary" value="Add Task"><br>
+    </form>
+</div>
+{% endblock %}

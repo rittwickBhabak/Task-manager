@@ -71,5 +71,12 @@ def signup():
         print(f'Name:{name},Email:{email},Password:{password},Confirm Password:{confirmPassword}')
     return render_template('signup.html', form=form)
 
+
+@app.route('/tasklist')
+def tasklist():
+    return render_template('taskList.html')
+
+
+
 if __name__ == "__main__":
     app.run(debug=True)

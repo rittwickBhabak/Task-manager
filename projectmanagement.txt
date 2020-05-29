@@ -1,10 +1,10 @@
 0. Do the basic setup. (Done)
 1. complete forms.py with forms (Done)
-2. edit basic.html, login.html, signup.html (frontend)
+2. edit basic.html, login.html, signup.html (frontend) (done)
 3. complete login and signup and logout porcess with index.html
-4. complete newtask.html front-end
+4. complete newtask.html front-end (done)
 5. complete newtask.html backend
 6. display tasks in index.html
-7. complete editTask.html front-end
+7. complete editTask.html front-end (done)
 8. complete editTask backend
 9. publish the app in pythonanywhere
