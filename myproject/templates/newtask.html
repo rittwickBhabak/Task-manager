@@ -2,7 +2,7 @@
 {% block newtaskactive %} active {% endblock %}
 {% block body %}
 <div class="container my-4">
-    <form action="/new" method="post">
+    <!-- <form action="/new" method="post">
         <div class="form-group">
             <label for="name">Name of the task/topic</label>
             <input type="text" class="form-control" name="name" id="name"><br>
@@ -55,6 +55,210 @@
             <input type="text" class="form-control mx-2" name="fifteenday" id="fifteenday"><br>
         </div>
         <input type="submit" class="btn btn-primary" value="Add Task"><br>
+    </form> -->
+    <form action="/new" method="POST">
+        <div class="form-group">
+            <label for="name">Name of the task</label>
+            <input type="text" class="form-control" name="name" id="name" required>
+        </div>
+        <div class="form-group">
+            <label for="name">How long the task should be continued? </label>
+            <div class="row">
+                <div class="col">
+                    <label for="sdate">Starting Date</label>
+                    <input type="date" class="form-control" name="sdate" id="sdate" required>
+                </div>
+                <div class="col">
+                    <label for="edate">Closing Date</label>
+                    <input type="date" class="form-control" name="edate" id="edate" required>
+                </div>
+
+            </div>
+        </div>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="interval-type" id="regularintervalradio" value="option1">
+            <label class="form-check-label" for="regularintervalradio">Regular Interval</label>
+        </div>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="interval-type" id="customintervalradio" value="option2">
+            <label class="form-check-label" for="customintervalradio">Custom Interval</label>
+        </div>
+        <div class="form-group">
+            <div class="row p-3">
+                <div class="col-sm-12 border rounded my-3 py-3" id="regular-col">
+                    <p class="lead text-center">Repeat at Regular Interval</p>
+                    <div class="row">
+                        <div class="col">
+                            <label for="regularinterval">After how many days you want to repeat the task?</label>
+                        </div>
+                        <div class="col">
+                            <input type="number" class="form-control" name="regularinterval" id="regularinterval">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-12 border rounded pt-3" id="custom-col">
+                    <p class="lead text-center">Repeat at Custom Interval</p>
+                    <div class="row my-2">
+                        <div class="col">
+                            <label for="everyday">Everyday</label>
+                        </div>
+                        <div class="col">
+                            <input type="number" class="form-control" name="everyday" id="everyday" value='0'>
+                        </div>
+                    </div>
+                    <div class="row my-2">
+                        <div class="col">
+                            <label for="twoday">Revise at two day interval</label>
+                        </div>
+                        <div class="col">
+                            <input type="number" class="form-control" name="twoday" id="twoday" value="0">
+                        </div>
+                    </div>
+                    <div class="row my-2">
+                        <div class="col">
+                            <label for="threeday">Revise at three day interval</label>
+                        </div>
+                        <div class="col">
+                            <input type="number" class="form-control" name="threeday" id="threeday" value="0">
+                        </div>
+                    </div>
+                    <div class="row my-2">
+                        <div class="col">
+                            <label for="fiveday">Revise at five day interval</label>
+                        </div>
+                        <div class="col">
+                            <input type="number" class="form-control" name="fiveday" id="fiveday" value="0">
+                        </div>
+                    </div>
+                    <div class="row my-2">
+                        <div class="col">
+                            <label for="sevenday">Revise at seven day interval</label>
+                        </div>
+                        <div class="col">
+                            <input type="number" class="form-control" name="sevenday" id="sevenday" value="0">
+                        </div>
+                    </div>
+                    <div class="row my-2">
+                        <div class="col">
+                            <label for="tenday">Revise at ten day interval</label>
+                        </div>
+                        <div class="col">
+                            <input type="number" class="form-control" name="tenday" id="tenday" value="0">
+                        </div>
+                    </div>
+                    <div class="row my-2">
+                        <div class="col">
+                            <label for="fifteenday">Revise at fifteen day interval</label>
+                        </div>
+                        <div class="col">
+                            <input type="number" class="form-control" name="fifteenday" id="fifteenday" value="0">
+                        </div>
+                    </div>
+                    <div class="row my-2">
+                        <div class="col">
+                            <label for="twentyday">Revise at twenty day interval</label>
+                        </div>
+                        <div class="col">
+                            <input type="number" class="form-control" name="twentyday" id="twentyday" value="0">
+                        </div>
+                    </div>
+                    <div class="row my-2">
+                        <div class="col">
+                            <label for="onemonth">Revise at one month interval</label>
+                        </div>
+                        <div class="col">
+                            <input type="number" class="form-control" name="onemonth" id="onemonth" value="0">
+                        </div>
+                    </div>
+                    <div class="row my-2">
+                        <div class="col">
+                            <label for="fourtyfiveday">Revise at fourtyfive day interval</label>
+                        </div>
+                        <div class="col">
+                            <input type="number" class="form-control" name="fourtyfiveday" id="fourtyfiveday" value="0">
+                        </div>
+                    </div>
+                    <div class="row my-2">
+                        <div class="col">
+                            <label for="twomonth">Revise at two month interval</label>
+                        </div>
+                        <div class="col">
+                            <input type="number" class="form-control" name="twomonth" id="twomonth" value="0">
+                        </div>
+                    </div>
+                    <div class="row my-2">
+                        <div class="col">
+                            <label for="threemonth">Revise at three month interval</label>
+                        </div>
+                        <div class="col">
+                            <input type="number" class="form-control" name="threemonth" id="threemonth" value="0">
+                        </div>
+                    </div>
+                    <div class="row my-2">
+                        <div class="col">
+                            <label for="fourmonth">Revise at four month interval</label>
+                        </div>
+                        <div class="col">
+                            <input type="number" class="form-control" name="fourmonth" id="fourmonth" value="0">
+                        </div>
+                    </div>
+                    <div class="row my-2">
+                        <div class="col">
+                            <label for="sixmonth">Revise at six month interval</label>
+                        </div>
+                        <div class="col">
+                            <input type="number" class="form-control" name="sixmonth" id="sixmonth" value="0">
+                        </div>
+                    </div>
+                    <div class="row my-2">
+                        <div class="col">
+                            <label for="oneyear">Revise at one year interval</label>
+                        </div>
+                        <div class="col">
+                            <input type="number" class="form-control" name="oneyear" id="oneyear" value="0">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <button class="btn btn-primary" type="submit">Add task</button>
     </form>
 </div>
+<script>
+    document.getElementById('regular-col').style.display = 'none';
+    document.getElementById('custom-col').style.display = 'none';
+    document.getElementById('regularintervalradio').addEventListener('click', () => {
+        if (document.getElementById('regularintervalradio').checked) {
+            document.getElementById('regular-col').style.display = 'block';
+            document.getElementById('custom-col').style.display = 'none';
+            reset();
+        }
+    })
+    document.getElementById('customintervalradio').addEventListener('click', () => {
+        if (document.getElementById('customintervalradio').checked) {
+            document.getElementById('custom-col').style.display = 'block';
+            document.getElementById('regular-col').style.display = 'none';
+            reset();
+        }
+    })
+    function reset() {
+        document.getElementById('regularinterval').value = 0;
+        document.getElementById('everyday').value = 0;
+        document.getElementById('twoday').value = 0;
+        document.getElementById('threeday').value = 0;
+        document.getElementById('fiveday').value = 0;
+        document.getElementById('sevenday').value = 0;
+        document.getElementById('tenday').value = 0;
+        document.getElementById('fifteenday').value = 0;
+        document.getElementById('twentyday').value = 0;
+        document.getElementById('onemonth').value = 0;
+        document.getElementById('fourtyfiveday').value = 0;
+        document.getElementById('twomonth').value = 0;
+        document.getElementById('threemonth').value = 0;
+        document.getElementById('fourmonth').value = 0;
+        document.getElementById('sixmonth').value = 0;
+        document.getElementById('oneyear').value = 0;
+    }
+</script>
 {% endblock %}

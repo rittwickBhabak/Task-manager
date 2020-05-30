@@ -4,12 +4,14 @@
 {% block signupactive %} active {% endblock %}
 {% block body %} 
 <div >
-    <div class="alert alert-success" role="alert">
-        Sign Up successful
+    {% for tag, msg in get_flashed_messages(with_categories=True) %}
+    <div class="alert alert-{{tag}}" role="alert">
+        {{msg}}
       </div>
+    {% endfor %}
 </div>
 <div class="container my-4">
-    <form action="POST">
+    <form method="POST">
         {{form.hidden_tag()}}
         <div class="form-group">
             {{form.name.label}}

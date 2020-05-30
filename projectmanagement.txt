@@ -1,7 +1,7 @@
 0. Do the basic setup. (Done)
 1. complete forms.py with forms (Done)
 2. edit basic.html, login.html, signup.html (frontend) (done)
-3. complete login and signup and logout porcess with index.html
+3. complete login and signup and logout porcess with index.html (done)
 4. complete newtask.html front-end (done)
 5. complete newtask.html backend
 6. display tasks in index.html

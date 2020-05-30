@@ -28,16 +28,20 @@ class Task(db.Model):
     startDay = db.Column(db.Integer)
     startMonth = db.Column(db.Integer)
     startYear = db.Column(db.Integer)
+    endDay = db.Column(db.Integer)
+    endMonth = db.Column(db.Integer)
+    endYear = db.Column(db.Integer)
     repetationList = db.Column(db.String)
-    duration = db.Column(db.Integer)
     
-    def __init__(self,taskName,userId,startDay,startMonth,startYear,repetationList,duration):
+    def __init__(self,taskName,userId,startDay,startMonth,startYear,repetationList, endDay,endMonth,endYear):
         self.taskName = taskName
         self.userId = userId
         self.startDay = startDay
         self.startMonth = startMonth
         self.startYear = startYear
-        self.duration = duration
+        self.endDay = endDay
+        self.endMonth = endMonth
+        self.endYear = endYear
         self.repetationList = repetationList
 
 class Revesion(db.Model):

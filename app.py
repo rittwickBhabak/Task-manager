@@ -1,5 +1,5 @@
 from myproject import app, db
-from flask import Flask, render_template, request, url_for, redirect, flash , abort 
+from flask import Flask, render_template, request, url_for, redirect, flash , abort, session
 from flask_login import login_user, login_required, logout_user 
 from myproject.models import User, Task, Revesion
 from myproject.forms import LoginForm, SignUpForm
@@ -9,24 +9,36 @@ def index():
     return render_template('index.html')
 
 @app.route('/new', methods=['GET','POST'])
+@login_required
 def newTask():
     if request.method=="POST":
         name = request.form['name']
-        startDay = request.form['day']
-        startMonth = request.form['month']
-        startYear = request.form['year']
-        duration = request.form['duration']
-        oneDay = request.form['oneday']
-        twoDay = request.form['twoday']
-        threeDay = request.form['threeday']
-        fiveDay = request.form['fiveday']
-        sevenDay = request.form['sevenday']
-        tenDay = request.form['tenday']
-        fifteenDay = request.form['fifteenday']
-        print(name, duration,oneDay,twoDay,threeDay,fiveDay,sevenDay, tenDay,fifteenDay)
+        syear,smonth,sday = request.form['sdate'].split('-')
+        eyear,emonth,eday = request.form['edate'].split('-')
+        regularinterval = request.form['regularinterval']
+        everyday = request.form['everyday']
+        twoday = request.form['twoday']
+        threeday = request.form['threeday']
+        fiveday = request.form['fiveday']
+        sevenday = request.form['sevenday']
+        tenday = request.form['tenday']
+        fifteenday = request.form['fifteenday']
+        twentyday = request.form['twentyday']
+        onemonth = request.form['onemonth']
+        fourtyfiveday = request.form['fourtyfiveday']
+        twomonth = request.form['twomonth']
+        threemonth = request.form['threemonth']
+        fourmonth = request.form['fourmonth']
+        sixmonth = request.form['sixmonth']
+        oneyear = request.form['oneyear']
+        
+        print(regularinterval, everyday, twoday, threeday, fiveday, sevenday, tenday,fifteenday, twentyday, onemonth, fourtyfiveday, twomonth, threemonth, fourmonth, sixmonth, oneyear)
+        new = Task(name,userId, sday,smonth,syear,repList,eday,emonth,eyear)
+        
     return render_template('newtask.html')
 
 @app.route('/update', methods=['GET','POST'])
+@login_required
 def editTask():
     if request.method=="POST":
         name = request.form['name']
@@ -57,6 +69,15 @@ def login():
     if form.validate_on_submit():
         email = form.email.data
         password = form.password.data
+        currentUser = User.query.filter_by(email=email).first()
+        if  currentUser is not None and currentUser.check_password(password):
+            session['user_id'] = currentUser.id
+            session['username'] = currentUser.name
+            login_user(currentUser)
+            return redirect(url_for('index'))
+        else:
+            flash('Some error occured. Please enter your email and password correctly and try again', 'danger')
+            return redirect(url_for('login'))
         print(f'Email:{email}, Password:{password}')
     return render_template('login.html', form=form)
 
@@ -68,7 +89,22 @@ def signup():
         email = form.email.data
         password = form.password.data
         confirmPassword = form.confirmPassword.data
+        errorMsg = None
+        if not password==confirmPassword:
+            errorMsg = 'Password and Confirm Password should match'
+        if User.query.filter_by(email=email).first() is not None:
+            errorMsg = 'Email already exists.'
+        if name=='' or email=='' or password=='':
+            errorMsg = 'Name, Email, Password can not be blank'
+        if errorMsg is not None:
+            flash(errorMsg, 'danger')
+            return redirect(url_for('signup'))
+        newUser = User(name, email, password)
+        db.session.add(newUser)
+        db.session.commit()
         print(f'Name:{name},Email:{email},Password:{password},Confirm Password:{confirmPassword}')
+        flash('Sign Up seccessfull', 'success`')
+        return redirect(url_for('login'))
     return render_template('signup.html', form=form)
 
 
@@ -76,7 +112,13 @@ def signup():
 def tasklist():
     return render_template('taskList.html')
 
-
+@app.route('/logout')
+@login_required
+def logout():
+    session['username'] = None
+    session['user_id'] = None
+    logout_user()
+    return redirect(url_for('login'))
 
 if __name__ == "__main__":
     app.run(debug=True)
