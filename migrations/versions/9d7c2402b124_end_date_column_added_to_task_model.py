@@ -1,8 +1,8 @@
-"""forms ready backend only
+"""end date column added to task model
 
-Revision ID: 0b8b99e744db
+Revision ID: 9d7c2402b124
 Revises: 
-Create Date: 2020-05-28 12:39:18.287660
+Create Date: 2020-05-31 10:56:22.357112
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '0b8b99e744db'
+revision = '9d7c2402b124'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -34,8 +34,10 @@ def upgrade():
     sa.Column('startDay', sa.Integer(), nullable=True),
     sa.Column('startMonth', sa.Integer(), nullable=True),
     sa.Column('startYear', sa.Integer(), nullable=True),
+    sa.Column('endDay', sa.Integer(), nullable=True),
+    sa.Column('endMonth', sa.Integer(), nullable=True),
+    sa.Column('endYear', sa.Integer(), nullable=True),
     sa.Column('repetationList', sa.String(), nullable=True),
-    sa.Column('duration', sa.Integer(), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('users',

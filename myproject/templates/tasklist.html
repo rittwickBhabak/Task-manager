@@ -1,27 +1,33 @@
 {% extends "base.html" %}
 {% block tasklistactive %} active {% endblock %}
 {% block body %}
+<div >
+    {% for tag, msg in get_flashed_messages(with_categories=True) %}
+    <div class="alert alert-{{tag}}" role="alert">
+        {{msg}}
+      </div>
+    {% endfor %}
+</div>
 <div class="container my-4">
 
     <table class="table">
         <thead class="thead-light">
             <tr>
-                <th scope="col">Task Id</th>
                 <th scope="col">Task Name</th>
                 <th scope="col">Started at</th>
-                <th scope="col">Duration</th>
+                <th scope="col">End date</th>
                 <th scope="col">Edit</th>
             </tr>
         </thead>
         <tbody>
+            {% for task in tasks %}
             <tr>
-                <th scope="row">1</th>
-                <td>Mark</td>
-                <td>Otto</td>
-                <td>@mdo</td>
-                <td><button class="btn btn-outline-warning">Edit task</button></td>
+                <td>{{task.taskName}}</td>
+                <td>{{ task.startDay }}.{{ task.startMonth }}.{{ task.startYear }}</td>
+                <td>{{ task.endDay }}.{{ task.endMonth }}.{{ task.endYear }}</td>
+                <td><a href="/update"><button class="btn btn-outline-warning">Edit task</button></a></td>
             </tr>
-
+            {% endfor %}
 
         </tbody>
     </table>

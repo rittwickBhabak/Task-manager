@@ -31,10 +31,13 @@ def newTask():
         fourmonth = request.form['fourmonth']
         sixmonth = request.form['sixmonth']
         oneyear = request.form['oneyear']
-        
-        print(regularinterval, everyday, twoday, threeday, fiveday, sevenday, tenday,fifteenday, twentyday, onemonth, fourtyfiveday, twomonth, threemonth, fourmonth, sixmonth, oneyear)
+        userId = session['user_id']
+        repList = '{"0":regularinterval, "1": everyday, "2":twoday, "3":threeday, "5":fiveday, "7":sevenday, "10":tenday,"15":fifteenday, "20":twentyday, "30":onemonth, "45":fourtyfiveday, "60":twomonth, "90":threemonth, "120":fourmonth, "180":sixmonth, "360":oneyear}'
         new = Task(name,userId, sday,smonth,syear,repList,eday,emonth,eyear)
-        
+        db.session.add(new)
+        db.session.commit()
+        flash('Task added successfully','success')
+        return redirect(url_for('tasklist'))
     return render_template('newtask.html')
 
 @app.route('/update', methods=['GET','POST'])
@@ -110,7 +113,8 @@ def signup():
 
 @app.route('/tasklist')
 def tasklist():
-    return render_template('taskList.html')
+    tasks = Task.query.filter_by(userId = session['user_id'])
+    return render_template('taskList.html', tasks=tasks)
 
 @app.route('/logout')
 @login_required

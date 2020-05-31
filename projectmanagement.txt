@@ -3,7 +3,8 @@
 2. edit basic.html, login.html, signup.html (frontend) (done)
 3. complete login and signup and logout porcess with index.html (done)
 4. complete newtask.html front-end (done)
-5. complete newtask.html backend
+5a. complete newtask.html backend (done)
+5b. add tasks to revision list
 6. display tasks in index.html
 7. complete editTask.html front-end (done)
 8. complete editTask backend
