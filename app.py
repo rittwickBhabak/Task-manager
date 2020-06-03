@@ -8,6 +8,10 @@ from myproject.forms import LoginForm, SignUpForm
 def index():
     return render_template('index.html')
 
+@app.route('/view')
+def view():
+    return render_template('viewtask.html', data={'name':'Rittwick','surname':'Bhabak','Dept': 'CSE'})
+
 @app.route('/new', methods=['GET','POST'])
 @login_required
 def newTask():

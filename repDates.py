@@ -3,9 +3,9 @@ from getDatesInSpecificInterval import getDates
 from getNextOrPreviousDay import nextDay, last_date_of_month
 
 def getRepDates(repList,sdate,edate):
-    repList = { "0":0, "1":2, "2":2, "3":2, "5":2, "7":4, "10":2, "15":0, "20":0, "30":0, "45":0, "60":0, "90":0, "120":0, "180":0, "360":0}
-    sdate = (1,2,2020)
-    edate = (last_date_of_month(12,2020),12,2020)
+    # repList = { "0":0, "1":2, "2":2, "3":2, "5":2, "7":4, "10":2, "15":0, "20":0, "30":0, "45":0, "60":0, "90":0, "120":0, "180":0, "360":0}
+    # sdate = (1,2,2020)
+    # edate = (last_date_of_month(12,2020),12,2020)
     pdate = sdate
     dates = []
     forverInterval = None
@@ -72,5 +72,5 @@ def getRepDates(repList,sdate,edate):
             dates.append(pdate)
     return dates
 
-dates = getRepDates(1,1,1)
-print(dates)
+# dates = getRepDates(1,1,1)
+# print(dates)
