@@ -3,6 +3,7 @@ from flask import Flask, render_template, request, url_for, redirect, flash , ab
 from flask_login import login_user, login_required, logout_user 
 from myproject.models import User, Task, Revesion
 from myproject.forms import LoginForm, SignUpForm
+from repDates import getRepDates
 
 @app.route('/')
 def index():
@@ -36,11 +37,19 @@ def newTask():
         sixmonth = request.form['sixmonth']
         oneyear = request.form['oneyear']
         userId = session['user_id']
-        repList = '{"0":regularinterval, "1": everyday, "2":twoday, "3":threeday, "5":fiveday, "7":sevenday, "10":tenday,"15":fifteenday, "20":twentyday, "30":onemonth, "45":fourtyfiveday, "60":twomonth, "90":threemonth, "120":fourmonth, "180":sixmonth, "360":oneyear}'
-        new = Task(name,userId, sday,smonth,syear,repList,eday,emonth,eyear)
+        repList = {"0":regularinterval, "1": everyday, "2":twoday, "3":threeday, "5":fiveday, "7":sevenday, "10":tenday,"15":fifteenday, "20":twentyday, "30":onemonth, "45":fourtyfiveday, "60":twomonth, "90":threemonth, "120":fourmonth, "180":sixmonth, "360":oneyear}
+        new = Task(name,userId, sday,smonth,syear,str(repList),eday,emonth,eyear)
         db.session.add(new)
         db.session.commit()
         flash('Task added successfully','success')
+        # taskId,userId,day,month,year
+        taskId = Task.query.order_by('id')[-1].id
+        repDates = getRepDates(repList,(sday,smonth,syear),(eday,emonth,eyear))
+        for repDate in repDates:
+            newRev = Revesion(taskId,userId, repDate[0], repDate[1], repDate[2])
+            db.session.add(newRev)
+            db.session.commit()
+        print(repDates)
         return redirect(url_for('tasklist'))
     return render_template('newtask.html')
 

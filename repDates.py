@@ -6,14 +6,21 @@ def getRepDates(repList,sdate,edate):
     # repList = { "0":0, "1":2, "2":2, "3":2, "5":2, "7":4, "10":2, "15":0, "20":0, "30":0, "45":0, "60":0, "90":0, "120":0, "180":0, "360":0}
     # sdate = (1,2,2020)
     # edate = (last_date_of_month(12,2020),12,2020)
+    sdate = (int(sdate[0]), int(sdate[1]), int(sdate[2]))
+    edate = (int(edate[0]), int(edate[1]), int(edate[2]))
+    for key, values in repList.items():
+        repList[key] = int(values)
+        print('Making Int: ',repList[key])
     pdate = sdate
     dates = []
     forverInterval = None
     if repList["0"]>0:
         while not isNewer(pdate, edate):
             dates.append(pdate)
+            print('Running isNewer from line 20',pdate, edate)
             for i in range(repList["0"]):
                 pdate = nextDay(pdate[0],pdate[1],pdate[2])
+        expFlag = 1
     else:
         tempList = [repList["1"],repList["2"],repList["3"],repList["5"],repList["7"],repList["10"],repList["15"],repList["20"],repList["30"],repList["45"],repList["60"],repList["90"],repList["120"],repList["180"],repList["360"]]
         myList = []
