@@ -22,37 +22,44 @@
     .week-day-name {
         background-color: aquamarine;
     }
-    #button-div{
+
+    #button-div {
         width: 350px;
         margin: auto;
     }
-    .pull-right{
+
+    .pull-right {
         float: right;
         /* clear: both; */
     }
-    .pull-left{
+
+    .pull-left {
         float: left;
         /* clear: both; */
     }
-    #go-to-prev-month{
+
+    #go-to-prev-month {
         width: 50px;
         height: 50px;
         display: inline-block;
         font-size: 25px;
     }
-    #go-to-next-month{
+
+    #go-to-next-month {
         width: 50px;
         height: 50px;
         display: inline-block;
         font-size: 25px;
     }
-    #month-year{
+
+    #month-year {
         width: 250px;
         height: 50px;
         display: inline-block;
         font-size: 25px;
     }
-    #calender-header{
+
+    #calender-header {
         width: 360px;
         display: block;
         margin: 10px auto;
@@ -62,11 +69,18 @@
 {% endblock %}
 {% block body %}
 <div class="container text-center my-3">
-    <h3>
-        Revision/Repitition days
-    </h3>
+    <div class="row">
+        <div class="col-2 text-center"><a href='/update/{{task.id}}'><button class="btn btn-primary">Edit Task</button></a></div>
+        <div class="col-8 text-center"><h3>{{task.taskName}} Revision/Repition Days</h3></div>
+        <div class="col-2 text-center"><a href='/del/{{task.id}}'><button class="btn btn-danger">Delete Task</button></a></div>
+    </div>
 </div>
-<div id="calender-header">
+<ul class="list-group text-center">
+    {% for date in revisionDates %}
+    <li class="list-group-item">{{date.day}}.{{date.month}}.{{date.year}}</li>
+    {% endfor %}
+</ul>
+<!-- <div id="calender-header">
     <div class="btn btn-outline-primary" id="go-to-prev-month">&#8592;</div>
     <div class="text-center" id="month-year">March 2020</div>
     <div class="btn btn-outline-primary" id="go-to-next-month">&#8594;</div>
@@ -125,12 +139,12 @@
 <div id="button-div" class="my-3">
     <a class="btn btn-primary pull-left text-white">Edit Task</a>
     <a class="btn btn-danger pull-right text-white">Delete Task</a>
-</div>
+</div> -->
 <script type="text/javascript">
-    function myFun(vars){
+    function myFun(vars) {
         return vars
     }
-    let myVar = myFun({{data|tojson}})
+    let myVar = myFun({{ data| tojson}})
     console.log(myVar);
 </script>
 {% endblock %}

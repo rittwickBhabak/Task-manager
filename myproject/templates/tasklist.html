@@ -16,7 +16,7 @@
                 <th scope="col">Task Name</th>
                 <th scope="col">Started at</th>
                 <th scope="col">End date</th>
-                <th scope="col">Edit</th>
+                <th scope="col">View</th>
             </tr>
         </thead>
         <tbody>
@@ -25,7 +25,7 @@
                 <td>{{task.taskName}}</td>
                 <td>{{ task.startDay }}.{{ task.startMonth }}.{{ task.startYear }}</td>
                 <td>{{ task.endDay }}.{{ task.endMonth }}.{{ task.endYear }}</td>
-                <td><a href="/update"><button class="btn btn-outline-warning">Edit task</button></a></td>
+                <td><a href="/view/{{task.id}}"><button class="btn btn-outline-warning">View task</button></a></td>
             </tr>
             {% endfor %}
 

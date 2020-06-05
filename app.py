@@ -9,9 +9,11 @@ from repDates import getRepDates
 def index():
     return render_template('index.html')
 
-@app.route('/view')
-def view():
-    return render_template('viewtask.html', data={'name':'Rittwick','surname':'Bhabak','Dept': 'CSE'})
+@app.route('/view/<int:id>')
+def view(id):
+    revisionDates = Revesion.query.filter_by(taskId=id)
+    task = Task.query.get(id)
+    return render_template('viewtask.html',revisionDates=revisionDates,task=task, data={'name':'Rittwick','surname':'Bhabak','Dept': 'CSE'})
 
 @app.route('/new', methods=['GET','POST'])
 @login_required
