@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block style %}
+
+{% endblock %}
+{% block body %}
+<div class="container bg-light">
+    <h1 class="text-center">{{ params['task'].name }}</h1>
+    <p class="lead">{{ params['task'].desc }}</p>
+    <div class="row">
+        <ol class='list-group col-6 float-left'>
+            {% for rep in params['reps'] %}
+
+            {% if rep.status == 1 %}
+            <li class="text-white list-group-item bg-success">{{rep.date.date() }}</li>
+            {% else %}
+            <li class="text-white list-group-item bg-danger">{{rep.date.date() }}</li>
+            {% endif %}
+            {% endfor %}
+        </ol>
+    </div>
+    <br>
+    <br>
+
+
+    <a href="{{url_for('update', id=params['task'].id)}}" class="btn btn-primary my-3">Update</a>
+    <form action="/delete/{{params['task'].id}}" method="POST">
+        
+        <!-- Button trigger modal -->
+        <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#exampleModal">
+            Delete
+        </button>
+        <!-- Modal -->
+        <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Confirmation</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        Confirm to Delete the whole task and its repetitions?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+
+
+</div>
+{% endblock %}

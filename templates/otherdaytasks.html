@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block homeactive %} active {% endblock %}
+
+{% block body %}
+<div class="container my-4 bg-light">
+  <h1 class="text-center">{{ params['header']}}</h1>
+  <h2 class="text-center">{{ params['date'] }}</h2>
+  <table class="table col-6 mx-auto">
+    <thead>
+      <tr>
+        <th scope="col"></th>
+        <th scope="col">Task</th>
+        <th scope="col">Date</th>
+      </tr>
+    </thead>
+
+
+    <tbody>
+
+
+
+      {% for rep in params['reps'] %}
+      <tr>
+
+        <th scope="row">
+          {% if rep['status']== 0 %}
+          <form class="was-validated" action="{{url_for('finishrep', id=rep['id'])}}" method="POST">
+          {% else %}
+          <form class="was-validated" action="{{url_for('undonerep', id=rep['id'])}}" method="POST">
+          {% endif %}
+            <div class="custom-control custom-checkbox mb-3">
+              {% if rep['status'] == 0 %}
+              <input type="checkbox" onchange="submit()" class="custom-control-input" id="task{{loop.index}}" required>
+              {% else %}
+              <input type="checkbox" onchange="submit()" class="custom-control-input" id="task{{loop.index}}" checked required>
+              {% endif %}
+              <label class="custom-control-label" for="task{{loop.index}}"></label>
+            </div>
+          </form>
+        </th>
+
+
+        <td>
+          {{rep['name']}}
+          <a href="{{url_for('task', id=rep['task'])}}">
+            <span><svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-box-arrow-up-right" fill="currentColor"
+                xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd"
+                  d="M8.636 3.5a.5.5 0 0 0-.5-.5H1.5A1.5 1.5 0 0 0 0 4.5v10A1.5 1.5 0 0 0 1.5 16h10a1.5 1.5 0 0 0 1.5-1.5V7.864a.5.5 0 0 0-1 0V14.5a.5.5 0 0 1-.5.5h-10a.5.5 0 0 1-.5-.5v-10a.5.5 0 0 1 .5-.5h6.636a.5.5 0 0 0 .5-.5z" />
+                <path fill-rule="evenodd"
+                  d="M16 .5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h3.793L6.146 9.146a.5.5 0 1 0 .708.708L15 1.707V5.5a.5.5 0 0 0 1 0v-5z" />
+              </svg>
+            </span>
+          </a>
+        </td>
+        <td>
+            {{ rep['date'].date() }}
+        </td>
+      </tr>
+      {% endfor %}
+
+
+
+
+    </tbody>
+  </table>
+</div>
+{% endblock %}

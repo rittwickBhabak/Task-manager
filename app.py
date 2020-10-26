@@ -1,143 +1,282 @@
-from myproject import app, db
-from flask import Flask, render_template, request, url_for, redirect, flash , abort, session
-from flask_login import login_user, login_required, logout_user 
-from myproject.models import User, Task, Revesion
-from myproject.forms import LoginForm, SignUpForm
-from repDates import getRepDates
+from flask import Flask, url_for, redirect, request, render_template, flash, current_app
+import os
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
+import time
+import datetime
+
+basedir = os.path.abspath(os.path.dirname(__file__))
+
+app = Flask(__name__)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'data.sqlite')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.secret_key = 'super secret key'
+
+db = SQLAlchemy(app)
+Migrate(app, db)
+
+class Tasks(db.Model):
+
+    __tablename__ = 'tasks'
+    id = db.Column(db.Integer, primary_key=True)
+    desc = db.Column(db.String)
+    name = db.Column(db.String, unique=True)
+
+    reps = db.relationship('Reps', cascade="all,delete", backref='tasks', lazy='dynamic')
+    def __init__(self, name, desc):
+        self.name = name
+        self.desc = desc
+
+
+class Reps(db.Model):
+
+    __tablename__ = 'reps'
+    id = db.Column(db.Integer, primary_key=True)
+    date = db.Column(db.DateTime)
+    status = db.Column(db.Integer)
+    task = db.Column(db.Integer, db.ForeignKey('tasks.id'))
+
+    def __init__(self, date, task, status):
+        self.task = task
+        self.date = date
+        self.status = status
+
 
 @app.route('/')
 def index():
-    return render_template('index.html')
 
-@app.route('/view/<int:id>')
-def view(id):
-    revisionDates = Revesion.query.filter_by(taskId=id)
-    task = Task.query.get(id)
-    return render_template('viewtask.html',revisionDates=revisionDates,task=task, data={'name':'Rittwick','surname':'Bhabak','Dept': 'CSE'})
+    today = datetime.datetime.now().date()
+    # today = datetime.date(2020,10,29)
+    # today is in the form yyyy-mm-dd
 
-@app.route('/new', methods=['GET','POST'])
-@login_required
-def newTask():
-    if request.method=="POST":
+    reps = Reps.query.all()
+    list_of_reps = []
+    for r in reps:
+        print(r.date)
+        y, m, d = str(r.date).split()[0].split('-')
+        y = int(y)
+        m = int(m)
+        d = int(d)
+        date = datetime.date(y,m,d)
+        if date==today:
+            task = Tasks.query.get(r.task)
+            rep = { 'name': task.name, 'id': r.id, 'status': r.status, 'task': task.id }
+            list_of_reps.append(rep)
+        
+    params = { 
+        'reps': list_of_reps,
+        'today': today.strftime('%d, %b %Y')
+    }
+    return render_template('index.html', params=params)
+
+@app.route('/new', methods=['GET', 'POST'])
+def newtask():
+    if request.method=='POST':
         name = request.form['name']
-        syear,smonth,sday = request.form['sdate'].split('-')
-        eyear,emonth,eday = request.form['edate'].split('-')
-        regularinterval = request.form['regularinterval']
-        everyday = request.form['everyday']
-        twoday = request.form['twoday']
-        threeday = request.form['threeday']
-        fiveday = request.form['fiveday']
-        sevenday = request.form['sevenday']
-        tenday = request.form['tenday']
-        fifteenday = request.form['fifteenday']
-        twentyday = request.form['twentyday']
-        onemonth = request.form['onemonth']
-        fourtyfiveday = request.form['fourtyfiveday']
-        twomonth = request.form['twomonth']
-        threemonth = request.form['threemonth']
-        fourmonth = request.form['fourmonth']
-        sixmonth = request.form['sixmonth']
-        oneyear = request.form['oneyear']
-        userId = session['user_id']
-        repList = {"0":regularinterval, "1": everyday, "2":twoday, "3":threeday, "5":fiveday, "7":sevenday, "10":tenday,"15":fifteenday, "20":twentyday, "30":onemonth, "45":fourtyfiveday, "60":twomonth, "90":threemonth, "120":fourmonth, "180":sixmonth, "360":oneyear}
-        new = Task(name,userId, sday,smonth,syear,str(repList),eday,emonth,eyear)
-        db.session.add(new)
-        db.session.commit()
-        flash('Task added successfully','success')
-        # taskId,userId,day,month,year
-        taskId = Task.query.order_by('id')[-1].id
-        repDates = getRepDates(repList,(sday,smonth,syear),(eday,emonth,eyear))
-        for repDate in repDates:
-            newRev = Revesion(taskId,userId, repDate[0], repDate[1], repDate[2])
-            db.session.add(newRev)
+        desc = request.form['desc']
+        dates = request.form['dates'].split(',')
+        print(name, desc, dates)
+        # flash('success', 'success')
+        # return redirect(url_for('newtask'))
+        task = Tasks(name, desc)
+        try: 
+            db.session.add(task)
             db.session.commit()
-        print(repDates)
-        return redirect(url_for('tasklist'))
-    return render_template('newtask.html')
+            task = Tasks.query.filter_by(name=name)[0]
+            id = task.id 
+            for date in dates:
+                date = datetime.date(*list(map(lambda x: int(x), date.split('-'))))
+                rep = Reps(date, id, 0)
+                db.session.add(rep)
+                db.session.commit()
+            flash('Task added successful.', 'success')
+            return redirect(url_for('task', id=id))
+        except Exception as e:
+            msg = "Either the task name already exists or some internal error occoured."
+            # msg = str(e)
+            flash(msg, 'danger')
+            params = {
+                'task': task,
+                'desc': desc,
+                'dates': ','.join(dates)
+            }
+            return render_template('newtask.html', params=None)
+    else:
+        return render_template('newtask.html', params=None)
 
-@app.route('/update', methods=['GET','POST'])
-@login_required
-def editTask():
-    if request.method=="POST":
-        name = request.form['name']
-        startDay = request.form['day']
-        startMonth = request.form['month']
-        startYear = request.form['year']
-        duration = request.form['duration']
-        oneDay = request.form['oneday']
-        twoDay = request.form['twoday']
-        threeDay = request.form['threeday']
-        fiveDay = request.form['fiveday']
-        sevenDay = request.form['sevenday']
-        tenDay = request.form['tenday']
-        fifteenDay = request.form['fifteenday']
-        deleteTask = None
-        try:
-            deleteTask = request.form['delete']
-        except:
-            deleteTask = None
-        print(name, duration,oneDay,twoDay,threeDay,fiveDay,sevenDay, tenDay,fifteenDay)
-        print('Will delete the task: ',deleteTask)
-    return render_template('edittask.html')
+@app.route('/task/<int:id>')
+def task(id):
+    task = Tasks.query.get(id)
+    reps = Reps.query.filter_by(task=task.id).order_by(Reps.date)
+    params = {
+        'task': task,
+        'reps': reps
+    }
+    return render_template('task.html', params=params)
 
-
-@app.route('/login', methods=['GET','POST'])
-def login():
-    form = LoginForm()
-    if form.validate_on_submit():
-        email = form.email.data
-        password = form.password.data
-        currentUser = User.query.filter_by(email=email).first()
-        if  currentUser is not None and currentUser.check_password(password):
-            session['user_id'] = currentUser.id
-            session['username'] = currentUser.name
-            login_user(currentUser)
-            return redirect(url_for('index'))
-        else:
-            flash('Some error occured. Please enter your email and password correctly and try again', 'danger')
-            return redirect(url_for('login'))
-        print(f'Email:{email}, Password:{password}')
-    return render_template('login.html', form=form)
-
-@app.route('/signup', methods=['GET','POST'])
-def signup():
-    form = SignUpForm()
-    if form.validate_on_submit():
-        name = form.name.data
-        email = form.email.data
-        password = form.password.data
-        confirmPassword = form.confirmPassword.data
-        errorMsg = None
-        if not password==confirmPassword:
-            errorMsg = 'Password and Confirm Password should match'
-        if User.query.filter_by(email=email).first() is not None:
-            errorMsg = 'Email already exists.'
-        if name=='' or email=='' or password=='':
-            errorMsg = 'Name, Email, Password can not be blank'
-        if errorMsg is not None:
-            flash(errorMsg, 'danger')
-            return redirect(url_for('signup'))
-        newUser = User(name, email, password)
-        db.session.add(newUser)
+@app.route('/update/<int:id>', methods=['GET', 'POST'])
+def update(id):
+    task = Tasks.query.get(id)
+    reps = Reps.query.filter_by(task=task.id)
+    dates = []
+    for r in reps:
+        dates.append(str(r.date).split()[0])
+        
+    dates = ','.join(dates)
+    if request.method == 'GET':
+        params = {
+            'task': task,
+            'reps': reps,
+            'dates': dates
+        }
+        return render_template('newtask.html', params=params)
+    else:
+        new_name = request.form['name']
+        new_desc = request.form['desc']
+        new_dates = request.form['dates'].split(',')
+        task.name = new_name
+        task.desc = new_desc
+        db.session.add(task)
         db.session.commit()
-        print(f'Name:{name},Email:{email},Password:{password},Confirm Password:{confirmPassword}')
-        flash('Sign Up seccessfull', 'success`')
-        return redirect(url_for('login'))
-    return render_template('signup.html', form=form)
+        reps = Reps.query.filter_by(task=id)
+        for rep in reps:
+            db.session.delete(rep)
+            db.session.commit()
+
+        for date in list(set(new_dates)):
+            date = datetime.date(*list(map(lambda x: int(x), date.split('-'))))
+            rep = Reps(date, id, 0)
+            db.session.add(rep)
+            db.session.commit()
+
+        flash('Task updated successful', 'success')
+        return redirect(url_for('task', id=id))
+    
+@app.route('/delete/<int:id>', methods=['GET', 'POST'])
+def delete(id):
+    task = Tasks.query.get(id)
+    if request.method == 'POST':
+        db.session.delete(task)
+        db.session.commit()
+        flash('Task successfully deleted', 'success')
+    return redirect(url_for('index'))   
+    
+@app.route('/alltask')
+def alltask():
+    tasks = Tasks.query.all()
+    params = {
+        'tasks': tasks
+    }
+    return render_template('tasklist.html', params=params)
+
+@app.route('/finishrep/<int:id>', methods=['GET', 'POST'])
+def finishrep(id):
+    rep = Reps.query.get(id)
+    task = Tasks.query.get(rep.task)
+    if request.method == 'POST':
+        rep.status = 1
+        db.session.add(rep)
+        db.session.commit()
+        flash('1 Task completed', 'success')
+    return redirect(url_for('index'))
 
 
-@app.route('/tasklist')
-def tasklist():
-    tasks = Task.query.filter_by(userId = session['user_id'])
-    return render_template('taskList.html', tasks=tasks)
+@app.route('/undonerep/<int:id>', methods=['GET', 'POST'])
+def undonerep(id):
+    rep = Reps.query.get(id)
+    task = Tasks.query.get(rep.task)
+    if request.method == 'POST':
+        rep.status = 0
+        db.session.add(rep)
+        db.session.commit()
+        flash('1 task undone', 'success')
+    return redirect(url_for('index'))
 
-@app.route('/logout')
-@login_required
-def logout():
-    session['username'] = None
-    session['user_id'] = None
-    logout_user()
-    return redirect(url_for('login'))
+@app.route('/privious-undone-tasks')
+def undonePrev():
+    
+    today = datetime.datetime.now().date()
+    # today = datetime.date(2020,10,29)
+    # today is in the form yyyy-mm-dd
+
+    reps = Reps.query.all()
+    list_of_reps = []
+    for r in reps:
+        print(r.date)
+        y, m, d = str(r.date).split()[0].split('-')
+        y = int(y)
+        m = int(m)
+        d = int(d)
+        date = datetime.date(y,m,d)
+        if date<=today and r.status==0:
+            task = Tasks.query.get(r.task)
+            rep = { 'name': task.name, 'id': r.id, 'status': r.status, 'task': task.id, 'date': r.date }
+            list_of_reps.append(rep)
+        
+    params = { 
+        'reps': list_of_reps,
+        'header': 'Previous Undone Tasks'
+    }
+    return render_template('otherdaytasks.html', params=params)
+
+
+@app.route('/tomorrow')
+def tomorrowTasks():
+    
+    today = datetime.datetime.now().date()
+    # today = datetime.date(2020,10,29)
+    # today is in the form yyyy-mm-dd
+    tomorrow = datetime.date.today() + datetime.timedelta(days=1)
+    print(tomorrow)
+
+    reps = Reps.query.all()
+    list_of_reps = []
+    for r in reps:
+        # print(r.date)
+        y, m, d = str(r.date).split()[0].split('-')
+        y = int(y)
+        m = int(m)
+        d = int(d)
+        date = datetime.date(y,m,d)
+        if date==tomorrow:
+            task = Tasks.query.get(r.task)
+            rep = { 'name': task.name, 'id': r.id, 'status': r.status, 'task': task.id, 'date': r.date }
+            list_of_reps.append(rep)
+        
+    params = { 
+        'reps': list_of_reps,
+        'header': 'Tomorrow\'s Tasks',
+        'date': tomorrow 
+    }
+    return render_template('otherdaytasks.html', params=params)
+
+@app.route('/goto')
+def goto():
+    y, m, d = request.args.get('date').split('-')
+    
+    gotoDate = datetime.date(int(y),int(m),int(d))
+
+    reps = Reps.query.all()
+    list_of_reps = []
+    for r in reps:
+        # print(r.date)
+        y, m, d = str(r.date).split()[0].split('-')
+        y = int(y)
+        m = int(m)
+        d = int(d)
+        date = datetime.date(y,m,d)
+        if date==gotoDate:
+            task = Tasks.query.get(r.task)
+            rep = { 'name': task.name, 'id': r.id, 'status': r.status, 'task': task.id, 'date': r.date }
+            list_of_reps.append(rep)
+        
+    params = { 
+        'reps': list_of_reps,
+        'header': 'Tasks',
+        'date': gotoDate
+    }
+    return render_template('otherdaytasks.html', params=params)
 
 if __name__ == "__main__":
     app.run(debug=True)

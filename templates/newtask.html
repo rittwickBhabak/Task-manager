@@ -1,0 +1,259 @@
+{% extends "base.html" %}
+{% block newtaskactive %} active {% endblock %}
+{% block style %}
+<style>
+    #calender {}
+
+    table,
+    th,
+    td,
+    tr {
+        border: 1px solid black;
+        border-collapse: collapse;
+    }
+
+    td,
+    th {
+        width: 50px;
+        height: 50px;
+        text-align: center;
+    }
+
+    #cal-header {
+        width: 350px;
+        height: 50px;
+        display: grid;
+        border: 1px solid black;
+        grid-template-columns: 50px 250px 50px;
+    }
+
+    #header {
+        text-align: center;
+    }
+
+    .date-btn-selected {
+        background-color: blue;
+        color: white;
+        border-radius: 0.25rem;
+        box-shadow: none;
+        outline: none;
+        border: none;
+    }
+    .date-btn{
+        border-radius: 0.25rem;
+        box-shadow: none;
+        outline: none;
+        border: none;
+        /* padding: 2px; */
+    }
+    #p-box,
+    #cal-days {
+        display: grid;
+        grid-template-columns: 50px 50px 50px 50px 50px 50px 50px;
+        /* border: 1px solid red; */
+        width: 350px;
+    }
+
+    .sm-box {
+        text-align: center;
+        height: 50px;
+        border: 1px solid black;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        justify-items: center;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+
+<div class="container my-4  bg-light">
+    {% if params %}
+    <form action="/update/{{params['task'].id}}" method="POST">
+        {% else %}
+        <form action="/new" method="POST">
+            {% endif %}
+
+
+            <div class="form-group">
+                <label for="name">Task Name</label>
+                {% if params %}
+                <input type="text" class="form-control" name="name" id="name" value="{{params['task'].name}}">
+                {% else %}
+                <input type="text" class="form-control" name="name" id="name" placeholder="Enter Task Name">
+                {% endif %}
+            </div>
+            <div class="form-group">
+                <label for="dates">Pick Dates</label>
+
+                <input type="text" name="dates" id="dates" class="form-control mb-2" value="{{params['dates']}}" readonly>
+                <div id="calender">
+                    <div id="cal-header">
+                        <button id="left-button" class="ctrl-btn">
+                            <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-caret-left-fill"
+                                fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M3.86 8.753l5.482 4.796c.646.566 1.658.106 1.658-.753V3.204a1 1 0 0 0-1.659-.753l-5.48 4.796a1 1 0 0 0 0 1.506z" />
+                            </svg>
+                        </button>
+                        <h3 id="header"></h3>
+                        <button id="right-button" class="ctrl-btn">
+                            <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-caret-right-fill"
+                                fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M12.14 8.753l-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div id="cal-days">
+                        <div class="sm-box">S</div>
+                        <div class="sm-box">M</div>
+                        <div class="sm-box">T</div>
+                        <div class="sm-box">W</div>
+                        <div class="sm-box">T</div>
+                        <div class="sm-box">F</div>
+                        <div class="sm-box">S</div>
+                    </div>
+                    <div id="p-box"></div>
+                </div>
+                <script>
+                    let seletedDates = new Set();
+                    values = document.getElementById('dates').value.split(',');
+                    for (let v of values) {
+                        [y, m, dd] = v.split('-')
+                        m = parseInt(m)
+                        dd = parseInt(dd)
+                        console.log(y, m, dd);
+                        if (1 <= m && m <= 12 && 1 <= dd && dd <= 31) {
+                            seletedDates.add(`${y}-${m}-${dd}`);
+                        }
+                    }
+                    let d = new Date();
+                    let currentDay = d.getDate();
+                    let currentMonth = d.getMonth();
+                    let currentYear = d.getFullYear();
+                    let initialGap = getInitialGap();
+                    let dates = document.getElementById('dates');
+                    let dateBtns = document.getElementsByClassName('date-btn');
+
+                    let leftBtn = document.getElementById('left-button');
+                    let rightBtn = document.getElementById('right-button');
+                    rightBtn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        rightCal();
+                    })
+                    leftBtn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        leftCal();
+                    })
+
+                    makeCalendar();
+                   
+
+                    function leftCal() {
+                        let d = new Date(currentYear, currentMonth, 1);
+                        d.setMonth(d.getMonth() - 1);
+                        currentMonth = d.getMonth();
+                        currentYear = d.getFullYear();
+                        initialGap = d.getDay();
+                        makeCalendar();
+                    }
+                    function rightCal() {
+                        let d = new Date(currentYear, currentMonth, 1);
+                        d.setMonth(d.getMonth() + 1);
+                        currentMonth = d.getMonth();
+                        currentYear = d.getFullYear();
+                        initialGap = d.getDay();
+                        makeCalendar();
+                    }
+                    function getInitialGap() {
+                        let x = new Date(currentYear, currentMonth, 1);
+                        return x.getDay();
+                    }
+                    function makeCalendar() {
+                        document.getElementById('p-box').innerHTML = '';
+                        let lastFullDate = new Date(currentYear, currentMonth + 1, 0);
+                        let lastDate = lastFullDate.getDate();
+                        let day = 0;
+                        let trOpen = 0;
+                        let trClose = 0;
+                        for (let i = 0; i < initialGap; i++) {
+                            let newDiv = document.createElement('div');
+                            newDiv.className = 'sm-box';
+                            document.getElementById('p-box').appendChild(newDiv);
+
+                        }
+                        for (let i = 1; i <= lastDate; i++) {
+                            let newDiv = document.createElement('div');
+                            newDiv.className = 'sm-box';
+                            let button = document.createElement('button');
+                            button.innerText = i;
+                            button.className = "date-btn";
+                            if (seletedDates.has(`${currentYear}-${currentMonth + 1}-${i}`)) {
+                                button.className = 'date-btn-selected';
+                            } else {
+                                button.className = "date-btn";
+                            }
+                            button.setAttribute('role', 'button');
+                            button.addEventListener('click', (e) => {
+                                e.preventDefault()
+                                let classes = e.target.classList;
+                                if (classes[1] == 'date-btn-selected' || classes[0] == 'date-btn-selected') {
+                                    e.target.className = "date-btn";
+                                    let id = parseInt(e.target.id.slice(4));
+                                    let dateStr = `${currentYear}-${currentMonth + 1}-${id}`;
+                                    console.log(dateStr);
+                                    seletedDates.delete(dateStr);
+                                    dates.value = '';
+                                    for (let v of seletedDates) {
+                                        if (dates.value === '') {
+                                            dates.value = dates.value + v;
+                                        } else {
+                                            dates.value = dates.value + ',' + v;
+                                        }
+                                    }
+                                } else {
+                                    e.target.className = "date-btn date-btn-selected";
+                                    let id = parseInt(e.target.id.slice(4));
+                                    let dateStr = `${currentYear}-${currentMonth + 1}-${id}`;
+                                    console.log(dateStr);
+                                    seletedDates.add(dateStr);
+                                    dates.value = '';
+                                    for (let v of seletedDates) {
+                                        if (dates.value === '') {
+                                            dates.value = dates.value + v;
+                                        } else {
+                                            dates.value = dates.value + ',' + v;
+                                        }
+                                    }
+                                }
+                            })
+                            button.id = `date${i}`
+                            newDiv.appendChild(button);
+                            document.getElementById('p-box').appendChild(newDiv);
+                            let months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+                            document.getElementById('header').innerText = months[currentMonth] + currentYear;
+                        }
+                    }
+                </script>
+            </div>
+
+            <div class="form-group">
+                <label for="desc">Description</label>
+                {% if params %}
+                <textarea class="form-control" name="desc" id="desc" rows="3">{{ params['desc'] }}</textarea>
+                {% else %}
+                <textarea class="form-control" name="desc" id="desc" rows="3"></textarea>
+                {% endif %}
+            </div>
+            {% if params %}
+            <input type="submit" value="Update Task" class="btn btn-primary">
+            {% else %}
+            <input type="submit" value="Add Task" class="btn btn-primary">
+            {% endif %}
+
+        </form>
+</div>
+
+{% endblock %}
